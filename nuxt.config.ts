@@ -31,6 +31,7 @@ export default defineNuxtConfig({
 			theme_color: '#ffffff',
 			background_color: '#ffffff',
 			display: 'standalone',
+			start_url: '/',
 			icons: [
 				{
 					src: '/icon-192x192.png',
@@ -43,6 +44,17 @@ export default defineNuxtConfig({
 					type: 'image/png',
 				},
 			],
+		},
+		workbox: {
+			cleanupOutdatedCaches: true, // 自動清理舊快取
+			clientsClaim: true, // 讓新的 Service Worker 立即生效
+			skipWaiting: true, // 讓新的 Service Worker 立即接管
+			runtimeCaching: [],
+		},
+		devOptions: {
+			enabled: true,
+			type: 'module',
+			navigateFallback: '/',
 		},
 	},
 });
