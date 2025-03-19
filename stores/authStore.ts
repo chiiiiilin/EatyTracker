@@ -2,7 +2,7 @@ import { defineStore } from 'pinia';
 import type { User } from '@supabase/supabase-js';
 
 export const useAuthStore = defineStore('authStore', () => {
-	const { $supabase } = useNuxtApp();
+	const { $supabase }:any = useNuxtApp();
 	const user = ref<User | null>(null);
 
 	const fetchUser = async () => {
