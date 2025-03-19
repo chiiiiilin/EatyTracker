@@ -1,14 +1,15 @@
 import { createClient } from '@supabase/supabase-js';
 
-export default defineNuxtPlugin(() => {
+export default defineNuxtPlugin((nuxtApp) => {
 	const config = useRuntimeConfig();
 
+	if (!config.public.supabaseUrl || !config.public.supabaseKey) {
+		throw new Error('Supabase 設定錯誤，請檢查 .env 是否正確讀取！');
+	}
 	const supabase = createClient(
 		config.public.supabaseUrl,
-		config.public.supabaseAnonKey
+		config.public.supabaseKey
 	);
 
-	return {
-		provide: { supabase },
-	};
+	nuxtApp.provide('supabase', supabase);
 });
