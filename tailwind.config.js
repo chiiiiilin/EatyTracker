@@ -1,18 +1,15 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-	darkMode: ['class'],
-	content: [],
-	theme: {
-		extend: {
-			borderRadius: {
-				lg: 'var(--radius)',
-				md: 'calc(var(--radius) - 2px)',
-				sm: 'calc(var(--radius) - 4px)',
-			},
-			colors: {
-				black: '#333333',
-			},
-		},
+	content: [
+		'./components/**/*.{vue,js,ts}',
+		'./layouts/**/*.vue',
+		'./pages/**/*.vue',
+		'./app.vue',
+		'./nuxt.config.ts',
+		'./assets/**/*.{css,scss}',
+	],
+	plugins: [require('tailwindcss-animate'), require('daisyui')],
+	daisyui: {
+		themes: ['light', 'dark', 'pastel'],
 	},
-	plugins: [require('tailwindcss-animate')],
 };

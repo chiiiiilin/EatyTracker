@@ -1,32 +1,33 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+console.log('SUPABASE_URL:', process.env.SUPABASE_URL);
+console.log('SUPABASE_ANON_KEY:', process.env.SUPABASE_ANON_KEY);
+
 export default defineNuxtConfig({
-	compatibilityDate: '2024-11-01',
+	watch: ['~/tailwind.config.js'],
 	devtools: { enabled: true },
+	css: ['@/assets/css/tailwind.css'],
+	postcss: {
+		plugins: {
+			tailwindcss: {},
+			autoprefixer: {},
+		},
+	},
 	modules: [
 		'@nuxtjs/tailwindcss',
 		'@pinia/nuxt',
-		'shadcn-nuxt',
 		'@vite-pwa/nuxt',
 	],
 	runtimeConfig: {
 		public: {
-			supabaseUrl: process.env.SUPABASE_URL,
-			supabaseAnonKey: process.env.SUPABASE_ANON_KEY,
+			supabaseUrl: process.env.SUPABASE_URL || '',
+			supabaseKey: process.env.SUPABASE_KEY || '',
 		},
-	},
-	shadcn: {
-		prefix: '',
-		/**
-		 * Directory that the component lives in.
-		 * @default "./components/ui"
-		 */
-		componentDir: './components/ui',
 	},
 	pwa: {
 		registerType: 'autoUpdate',
 		manifest: {
-			name: 'EatyTrack',
-			short_name: 'EatyTrack',
+			name: 'EatyTracker',
+			short_name: 'EatyTracker',
 			description: '卡路里追蹤與健康管理',
 			theme_color: '#ffffff',
 			background_color: '#ffffff',
@@ -46,13 +47,12 @@ export default defineNuxtConfig({
 			],
 		},
 		workbox: {
-			cleanupOutdatedCaches: true, // 自動清理舊快取
-			clientsClaim: true, // 讓新的 Service Worker 立即生效
-			skipWaiting: true, // 讓新的 Service Worker 立即接管
-			runtimeCaching: [],
+			disableDevLogs: true, // 停用 Workbox 開發日誌
+			runtimeCaching: [], // 移除快取策略
+			navigateFallback: null, // 避免 Workbox 攔截所有請求
 		},
 		devOptions: {
-			enabled: true,
+			enabled: false,
 			type: 'module',
 			navigateFallback: '/',
 		},
