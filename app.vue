@@ -1,4 +1,7 @@
 <template>
+	<ClientOnly>
+		<UiToast ref="toastRef" />
+	</ClientOnly>
 	<div>
 		<NuxtLayout>
 			<NuxtPage />
@@ -6,7 +9,11 @@
 	</div>
 </template>
 <script setup>
+import UiToast from '@/components/ui/Toast.vue';
 import { useHead } from '#imports';
+
+const toastRef = ref(null);
+provide('toast', toastRef);
 
 useHead({
 	htmlAttrs: { 'data-theme': 'pastel' },
