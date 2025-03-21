@@ -1,7 +1,3 @@
-// https://nuxt.com/docs/api/configuration/nuxt-config
-console.log('SUPABASE_URL:', process.env.SUPABASE_URL);
-console.log('SUPABASE_ANON_KEY:', process.env.SUPABASE_ANON_KEY);
-
 export default defineNuxtConfig({
 	watch: ['~/tailwind.config.js'],
 	devtools: { enabled: true },
@@ -12,11 +8,7 @@ export default defineNuxtConfig({
 			autoprefixer: {},
 		},
 	},
-	modules: [
-		'@nuxtjs/tailwindcss',
-		'@pinia/nuxt',
-		'@vite-pwa/nuxt',
-	],
+	modules: ['@nuxtjs/tailwindcss', '@pinia/nuxt', '@vite-pwa/nuxt'],
 	runtimeConfig: {
 		public: {
 			supabaseUrl: process.env.SUPABASE_URL || '',
