@@ -2,12 +2,18 @@
 	<nav
 		class="fixed bg-neutral w-screen bottom-0 h-16 rounded-t-xl text-primary-content flex justify-evenly items-center"
 	>
-		<House :size="28" />
-		<Cherry :size="28" />
-		<Notebook :size="28" />
-		<!-- <PencilLine :size="28" /> -->
-		<ChartBarBig :size="28" />
-		<Settings2 :size="28" />
+		<NuxtLink
+			v-for="item in navItems"
+			:key="item.to"
+			:to="item.to"
+			class="item flex flex-col items-center p-2 rounded-full"
+			:class="{
+				'bg-primary-content text-neutral': route.path === item.to,
+				'text-primary-content': route.path !== item.to,
+			}"
+		>
+			<component :is="item.icon" :size="28" />
+		</NuxtLink>
 	</nav>
 </template>
 
@@ -20,6 +26,18 @@ import {
 	Settings2,
 	Notebook,
 } from 'lucide-vue-next';
+
+import { useRoute } from 'vue-router';
+
+const route = useRoute();
+
+const navItems = [
+	{ icon: House, to: '/' },
+	{ icon: Cherry, to: '/food' },
+	{ icon: Notebook, to: '/diary' },
+	{ icon: ChartBarBig, to: '/tracking' },
+	{ icon: Settings2, to: '/auth/profile' },
+];
 </script>
 
-<style lang="scss" scoped></style>
+<style scoped></style>
