@@ -50,9 +50,9 @@ export const useAuthStore = defineStore('authStore', () => {
 	const signInWithOAuth = async () => {
 		const { data, error } = await $supabase.auth.signInWithOAuth({
 			provider: 'google',
-			options: {
-				redirectTo: 'http://localhost:3000/',
-			},
+			// options: {
+			// 	redirectTo: 'http://localhost:3000/',
+			// },
 		});
 		if (error) {
 			console.error('google 登入失敗', error);
