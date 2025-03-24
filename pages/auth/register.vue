@@ -1,51 +1,51 @@
 <template>
 	<div
-		class="bg-[url(https://i.pinimg.com/736x/53/fb/dc/53fbdc3ec68eedc97368de7ff7527903.jpg)] w-screen h-screen relative"
+		class="w-full rounded-t-3xl px-8 py-16 absolute bottom-0 z-50 bg-base-200"
 	>
-		<div
-			class="w-full rounded-t-3xl px-8 py-20 fixed bottom-0 z-50 bg-base-200"
-		>
-			<h2 class="my-2">註冊</h2>
-			<form @submit.prevent="submitEvent" class="flex flex-col">
-				<label class="input input-lg w-full my-2">
-					<Mail :size="18" class="mr-1" />
-					<input
-						type="email"
-						placeholder="電子郵件"
-						required
-						v-model="user.email"
-					/>
-				</label>
-				<label class="input input-lg w-full my-2">
-					<KeyRound :size="18" class="mr-1" />
-					<input
-						type="password"
-						placeholder="請設置八位數以上英數混和密碼"
-						required
-						v-model="user.password"
-					/>
-				</label>
-				<label class="input input-lg w-full my-2">
-					<KeyRound :size="18" class="mr-1" />
-					<input
-						type="password"
-						placeholder="再次確認密碼"
-						required
-						v-model="user.dbCheckPassword"
-					/>
-				</label>
-				<button class="btn btn-neutral mt-8 btn-xl">註冊</button>
-				<NuxtLink to="/auth/login" class="text-center my-3"
-					>已經有帳號?直接登入</NuxtLink
-				>
-			</form>
-		</div>
+		<h2 class="my-2">註冊</h2>
+		<form @submit.prevent="submitEvent" class="flex flex-col">
+			<label class="input input-lg w-full my-2">
+				<Mail :size="18" class="mr-1" />
+				<input
+					type="email"
+					placeholder="電子郵件"
+					required
+					v-model="user.email"
+				/>
+			</label>
+			<label class="input input-lg w-full my-2">
+				<KeyRound :size="18" class="mr-1" />
+				<input
+					type="password"
+					placeholder="請設置八位數以上英數混和密碼"
+					required
+					v-model="user.password"
+				/>
+			</label>
+			<label class="input input-lg w-full my-2">
+				<KeyRound :size="18" class="mr-1" />
+				<input
+					type="password"
+					placeholder="再次確認密碼"
+					required
+					v-model="user.dbCheckPassword"
+				/>
+			</label>
+			<button class="btn btn-neutral mt-8 btn-xl">註冊</button>
+			<NuxtLink to="/auth/login" class="text-center my-3"
+				>已經有帳號?直接登入</NuxtLink
+			>
+		</form>
 	</div>
 </template>
 
 <script setup lang="ts">
 import { Mail, KeyRound } from 'lucide-vue-next';
 import { ref } from 'vue';
+
+definePageMeta({
+	layout: 'empty',
+});
 
 const authStore = useAuthStore();
 
