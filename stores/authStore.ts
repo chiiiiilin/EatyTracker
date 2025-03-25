@@ -4,16 +4,55 @@ import type { User } from '@supabase/supabase-js';
 export const useAuthStore = defineStore('authStore', () => {
 	const { $supabase }: any = useNuxtApp();
 	const user = ref<User | null>(null);
+	const userProfile = ref<any>(null);
 
 	const fetchUser = async () => {
-		const { data, error } = await $supabase.auth.getUser();
-		if (data) user.value = data.user;
-		if (error) console.error('無法獲取使用者資訊：', error);
+		const { data: session } = await $supabase.auth.getUser();
+		const authUser = session?.user;
+		if (!authUser) return;
+
+		user.value = authUser;
+
+		// 抓取 users 資料表資料
+		const { data: existingUser } = await $supabase
+			.from('users')
+			.select('*')
+			.eq('id', authUser.id)
+			.single();
+
+		if (existingUser) {
+			userProfile.value = existingUser;
+		} else {
+			const newUser = {
+				id: authUser.id,
+				email: authUser.email,
+				display_name: authUser.user_metadata?.full_name || 'User',
+				avatar_url:
+					authUser.user_metadata?.avatar_url ||
+					'https://i.pinimg.com/736x/bb/93/99/bb93993d644835d9aa673c760cad0585.jpg',
+				created_at: new Date().toISOString(),
+			};
+
+			const { data: inserted, error: insertError } = await $supabase
+				.from('users')
+				.insert(newUser)
+				.select()
+				.single();
+
+			if (!insertError) {
+				userProfile.value = inserted;
+			} else {
+				console.error('寫入 userProfile 失敗', insertError);
+			}
+		}
 	};
 
 	const signInWithOAuth = async () => {
 		const { data, error } = await $supabase.auth.signInWithOAuth({
 			provider: 'google',
+			// options: {
+			// 	redirectTo: 'http://localhost:3000/',
+			// },
 		});
 		if (error) {
 			console.error('google 登入失敗', error);
@@ -27,8 +66,10 @@ export const useAuthStore = defineStore('authStore', () => {
 		}
 
 		const { id, email, user_metadata } = session.user;
-		const full_name = user_metadata?.full_name || '';
-		const avatar_url = user_metadata?.avatar_url || '';
+		const display_name = user_metadata?.full_name || 'User';
+		const avatar_url =
+			user_metadata?.avatar_url ||
+			'https://i.pinimg.com/736x/bb/93/99/bb93993d644835d9aa673c760cad0585.jpg';
 
 		const { data: appUser } = await $supabase
 			.from('users')
@@ -42,7 +83,7 @@ export const useAuthStore = defineStore('authStore', () => {
 				.insert({
 					id,
 					email,
-					full_name,
+					display_name,
 					avatar_url,
 					created_at: new Date().toISOString(),
 				});
@@ -137,12 +178,15 @@ export const useAuthStore = defineStore('authStore', () => {
 			.eq('email', email)
 			.single();
 
-		if (!existingUser) {
+		if (!existingUser && userCheckError) {
 			const { error: insertError } = await $supabase
 				.from('users')
 				.insert({
 					id: userData.id,
 					email: userData.email,
+					display_name: 'User',
+					avatar_url:
+						'https://i.pinimg.com/736x/bb/93/99/bb93993d644835d9aa673c760cad0585.jpg',
 					created_at: new Date().toISOString(),
 				});
 
@@ -175,13 +219,31 @@ export const useAuthStore = defineStore('authStore', () => {
 		}
 	};
 
+	const updateUserProfile = async (payload: any) => {
+		if (!user.value) return;
+		const { error } = await $supabase
+			.from('users')
+			.update(payload)
+			.eq('id', user.value.id);
+
+		if (!error) {
+			userProfile.value = { ...userProfile.value, ...payload };
+			return {
+				success: true,
+				message: '已上傳個人圖片',
+			};
+		}
+	};
+
 	return {
 		user,
+		userProfile,
 		fetchUser,
 		signIn,
 		signInWithOAuth,
 		signOut,
 		signUp,
 		resendVerificationEmail,
+		updateUserProfile,
 	};
 });

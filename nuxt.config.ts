@@ -1,7 +1,11 @@
 export default defineNuxtConfig({
-	watch: ['~/tailwind.config.js'],
+	tailwindcss: {
+		configPath: 'tailwind.config.ts',
+		viewer: true,
+	},
+	watch: ['tailwind.config.js', 'assets/css/**/*'],
 	devtools: { enabled: true },
-	css: ['@/assets/css/tailwind.css'],
+	css: ['~/assets/css/tailwind.css'],
 	postcss: {
 		plugins: {
 			tailwindcss: {},

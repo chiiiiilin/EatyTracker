@@ -98,7 +98,7 @@ const submitEvent = async () => {
 			await navigateTo('/');
 			toast.show('登入成功！', 'success');
 		} else {
-			toast.show('登入失敗', 'error');
+			toast.show(result?.error, 'error');
 		}
 	} catch (error) {
 		console.error(error);
