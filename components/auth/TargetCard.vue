@@ -22,7 +22,7 @@
 					<Flame :size="20" />
 				</div>
 				<p class="text-3xl text-secondary mt-5 mb-2">
-					{{ authStore.userProfile.calorie_target }}
+					{{ calorieTarget }}
 				</p>
 				<p class="text-base-content text-sm">目標卡路里</p>
 			</div>
@@ -53,6 +53,8 @@ const activityLevel = computed(() => {
 	};
 	return map[authStore.userProfile.activity_level] || '未設定';
 });
+
+const calorieTarget = authStore.userProfile.calorie_target || '未設定';
 
 const fitnessGoal = computed(() => {
 	const map: Record<string, string> = {

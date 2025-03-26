@@ -1,6 +1,6 @@
 <template>
 	<UiBackButton />
-	<div class="flex flex-col items-center top-5 relative">
+	<div class="flex flex-col items-center top-5 relative pb-20">
 		<h1 class="text-xl mb-16">編輯個人資料</h1>
 		<AuthAvatar />
 		<form class="w-full px-4 mt-5">
@@ -40,6 +40,7 @@
 				<option disabled selected>請選擇生理性別</option>
 				<option value="male">男</option>
 				<option value="female">女</option>
+				<option value="others">其他</option>
 			</select>
 			<legend class="mt-3 mb-2 font-bold">身高</legend>
 			<input
@@ -47,6 +48,20 @@
 				type="number"
 				class="input input-bordered w-full"
 				placeholder="請填入身高"
+			/>
+			<legend class="mt-3 mb-2 font-bold">初始體重</legend>
+			<input
+				v-model="userData.initWeight"
+				type="number"
+				class="input input-bordered w-full"
+				placeholder="請填入開始減脂前的體重"
+			/>
+			<legend class="mt-3 mb-2 font-bold">目標體重</legend>
+			<input
+				v-model="userData.targetWeight"
+				type="number"
+				class="input input-bordered w-full"
+				placeholder="請填入目標體重"
 			/>
 			<legend class="mt-3 mb-2 font-bold">健身目標</legend>
 			<select class="select w-full" v-model="userData.fitnessGoal">
@@ -77,7 +92,7 @@
 				v-model="userData.calorieTarget"
 				type="number"
 				class="input input-bordered w-full"
-				placeholder="請填入熱量目標，或自動計算"
+				placeholder="請填入熱量目標"
 			/>
 			<button
 				class="btn btn-primary w-full my-5"
@@ -106,6 +121,8 @@ const userData = ref({
 	fitnessGoal: '',
 	activityLevel: '',
 	calorieTarget: null,
+	initWeight: null,
+	targetWeight: null,
 });
 const today = new Date().toISOString().split('T')[0];
 
@@ -121,6 +138,8 @@ onMounted(() => {
 			fitnessGoal: authStore.userProfile.fitness_goal || '',
 			activityLevel: authStore.userProfile.activity_level || '',
 			calorieTarget: authStore.userProfile.calorie_target || null,
+			initWeight: authStore.userProfile.init_weight || null,
+			targetWeight: authStore.userProfile.target_weight || null,
 		};
 	}
 });
@@ -134,6 +153,8 @@ const submitProfile = async () => {
 		fitness_goal: userData.value.fitnessGoal,
 		activity_level: userData.value.activityLevel,
 		calorie_target: userData.value.calorieTarget,
+		init_weight: userData.value.initWeight,
+		target_weight: userData.value.targetWeight,
 	};
 	const result = await authStore.updateUserProfile(payload);
 
