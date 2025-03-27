@@ -22,7 +22,9 @@
 					v-model="user.password"
 				/>
 			</label>
-			<span class="text-right">忘記密碼?</span>
+			<span class="text-right cursor-pointer" @click="forgetPassword()"
+				>忘記密碼?</span
+			>
 			<button class="btn btn-neutral mt-8 btn-xl">登入</button>
 		</form>
 		<div class="divider my-8">或</div>
@@ -68,14 +70,17 @@
 <script setup lang="ts">
 import { Mail } from 'lucide-vue-next';
 import { KeyRound } from 'lucide-vue-next';
+import { useRouter } from 'vue-router';
+const { $supabase }: any = useNuxtApp();
+const router = useRouter();
+const config = useRuntimeConfig().public.supabaseRedirectUrl;
+const authStore = useAuthStore();
+const toast = useToast();
 const loadingBar = useLoadingBar();
 
 definePageMeta({
 	layout: 'empty',
 });
-
-const authStore = useAuthStore();
-const toast = useToast();
 
 const user = ref({
 	email: '',
@@ -107,6 +112,35 @@ const submitEvent = async () => {
 		loadingBar.error();
 		console.error(error);
 		toast.show('登入失敗，請稍後再試', 'error');
+	}
+};
+
+const forgetPassword = async () => {
+	if (!emailRegex.test(user.value.email)) {
+		toast.show('請輸入正確的電子郵件信箱', 'error');
+		return false;
+	}
+	loadingBar.start();
+	try {
+		const { error } = await $supabase.auth.resetPasswordForEmail(
+			user.value.email,
+			{
+				redirectTo: `${config}auth/updatePassword`,
+			}
+		);
+		console.log(`${config}auth/updatePassword`);
+
+		if (!error) {
+			loadingBar.end();
+			toast.show('請至email收信', 'info');
+			router.push('/auth/login');
+		} else {
+			loadingBar.error();
+			toast.show('請稍後再試', 'error');
+		}
+	} catch (error) {
+		loadingBar.error();
+		toast.show('請稍後再試', 'error');
 	}
 };
 </script>
