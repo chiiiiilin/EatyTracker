@@ -13,7 +13,7 @@ export default defineNuxtConfig({
 		},
 	},
 	plugins: ['@/plugins/supabase.ts', '@/plugins/initAuth.ts'],
-	modules: ['@nuxtjs/tailwindcss', '@pinia/nuxt', '@vite-pwa/nuxt'],
+	modules: ['@nuxtjs/tailwindcss', '@pinia/nuxt'],
 	runtimeConfig: {
 		public: {
 			supabaseUrl: process.env.SUPABASE_URL || '',
@@ -21,38 +21,24 @@ export default defineNuxtConfig({
 			supabaseRedirectUrl: process.env.NUXT_SUPABASE_REDIRECT_URL || '',
 		},
 	},
-	pwa: {
-		registerType: 'autoUpdate',
-		manifest: {
-			name: 'EatyTracker',
-			short_name: 'EatyTracker',
-			description: '卡路里追蹤與健康管理',
-			theme_color: '#ffffff',
-			background_color: '#ffffff',
-			display: 'standalone',
-			start_url: '/',
-			icons: [
+	app: {
+		head: {
+			title: 'EatyTracker',
+			meta: [{ name: 'theme-color', content: '#ffffff' }],
+			link: [
 				{
-					src: '/icon-192x192.png',
-					sizes: '192x192',
+					key: 'icon',
+					rel: 'icon',
 					type: 'image/png',
+					href: '/icon-192x192.png',
 				},
 				{
-					src: '/icon-512x512.png',
-					sizes: '512x512',
-					type: 'image/png',
+					key: 'apple-touch-icon',
+					rel: 'apple-touch-icon',
+					href: '/icon-512x512.png',
 				},
+				{ rel: 'manifest', href: '/manifest.json' },
 			],
-		},
-		workbox: {
-			disableDevLogs: true, // 停用 Workbox 開發日誌
-			runtimeCaching: [], // 移除快取策略
-			navigateFallback: null, // 避免 Workbox 攔截所有請求
-		},
-		devOptions: {
-			enabled: false,
-			type: 'module',
-			navigateFallback: '/',
 		},
 	},
 });

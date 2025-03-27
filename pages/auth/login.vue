@@ -128,7 +128,6 @@ const forgetPassword = async () => {
 				redirectTo: `${config}auth/updatePassword`,
 			}
 		);
-		console.log(`${config}auth/updatePassword`);
 
 		if (!error) {
 			loadingBar.end();

@@ -13,7 +13,6 @@
     "@nuxtjs/tailwindcss": "^6.13.2",
     "@pinia/nuxt": "^0.10.1",
     "@supabase/supabase-js": "^2.49.1",
-    "@vite-pwa/nuxt": "^0.10.6",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "daisyui": "^5.0.6",

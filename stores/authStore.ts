@@ -33,7 +33,6 @@ export const useAuthStore = defineStore('authStore', () => {
 			}
 
 			if (existingUser) {
-				console.log('獲取到的 existingUser:', existingUser);
 				userProfile.value = {
 					...existingUser,
 					avatar_url:
