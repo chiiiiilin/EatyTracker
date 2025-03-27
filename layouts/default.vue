@@ -1,12 +1,8 @@
-<script setup lang="ts"></script>
-
 <template>
-	<div class="min-h-screen flex flex-col">
+	<div class="w-full max-w-md min-h-screen flex flex-col mx-auto">
 		<div class="flex-1 bg-base-200 pb-24">
 			<slot />
 		</div>
 		<TabBar />
 	</div>
 </template>
-
-<style scoped></style>

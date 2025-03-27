@@ -18,7 +18,7 @@
 		</ul>
 	</div>
 
-	<div class="max-w-md mx-auto w-full space-y-6 p-5 relative">
+	<div class="mx-auto w-full space-y-6 p-5 relative">
 		<!-- Step 1: 基本資料 -->
 		<div v-if="currentStep === 0" class="space-y-4">
 			<div>
@@ -148,7 +148,7 @@
 					<tr>
 						<td>總熱量</td>
 						<td colspan="2">
-							<div class="relative w-full max-w-xs">
+							<div class="relative w-full">
 								<input
 									v-model.number="macroInput.calorie"
 									type="number"
@@ -170,11 +170,11 @@
 					<tr>
 						<td>蛋白質</td>
 						<td>
-							<div class="relative w-full max-w-xs">
+							<div class="relative w-full">
 								<input
 									v-model.number="macroInput.ratio.protein"
 									type="number"
-									class="input input-bordered w-full max-w-xs"
+									class="input input-bordered w-full"
 									@input="isMacrosEdited = true"
 								/>
 								<span
@@ -188,11 +188,11 @@
 					<tr>
 						<td>脂肪</td>
 						<td>
-							<div class="relative w-full max-w-xs">
+							<div class="relative w-full">
 								<input
 									v-model.number="macroInput.ratio.fat"
 									type="number"
-									class="input input-bordered w-full max-w-xs"
+									class="input input-bordered w-full"
 									@input="isMacrosEdited = true"
 								/>
 								<span
@@ -206,11 +206,11 @@
 					<tr>
 						<td>碳水</td>
 						<td>
-							<div class="relative w-full max-w-xs">
+							<div class="relative w-full">
 								<input
 									v-model.number="macroInput.ratio.carb"
 									type="number"
-									class="input input-bordered w-full max-w-xs"
+									class="input input-bordered w-full"
 									@input="isMacrosEdited = true"
 								/>
 								<span
