@@ -1,6 +1,7 @@
 <template>
 	<ClientOnly>
 		<UiToast ref="toastRef" />
+		<UiLoadingBar ref="loadingBarRef" />
 	</ClientOnly>
 	<div>
 		<NuxtLayout>
@@ -10,10 +11,14 @@
 </template>
 <script setup>
 import UiToast from '@/components/ui/Toast.vue';
+import UiLoadingBar from '@/components/ui/LoadingBar.vue';
 import { useHead } from '#imports';
 
 const toastRef = ref(null);
 provide('toast', toastRef);
+
+const loadingBarRef = ref(null);
+provide('loadingBar', loadingBarRef);
 
 useHead({
 	htmlAttrs: { 'data-theme': 'pastel' },

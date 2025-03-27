@@ -1,6 +1,6 @@
 <template>
 	<UiBackButton />
-	<div class="flex flex-col items-center top-5 relative pb-20">
+	<div class="flex flex-col items-center top-5 relative">
 		<h1 class="text-xl mb-16">編輯個人資料</h1>
 		<AuthAvatar />
 		<form class="w-full px-4 mt-5">
@@ -108,6 +108,7 @@
 import { UiBackButton } from '#components';
 import { useRouter } from 'vue-router';
 const toast = useToast();
+const loadingBar = useLoadingBar();
 const router = useRouter();
 const authStore = useAuthStore();
 
@@ -144,6 +145,8 @@ onMounted(() => {
 	}
 });
 const submitProfile = async () => {
+	loadingBar.start();
+
 	const payload = {
 		display_name: userData.value.displayName,
 		status_message: userData.value.statusMessage,
@@ -156,13 +159,19 @@ const submitProfile = async () => {
 		init_weight: userData.value.initWeight,
 		target_weight: userData.value.targetWeight,
 	};
-	const result = await authStore.updateUserProfile(payload);
+	try {
+		const result = await authStore.updateUserProfile(payload);
 
-	if (result?.success) {
-		router.push('/auth/profile');
-		toast.show('更新成功', 'success');
-	} else {
-		toast.show('更新失敗，請稍後再試', 'error');
+		if (result?.success) {
+			loadingBar.end();
+			router.push('/auth/profile');
+		} else {
+			loadingBar.error();
+			toast.show('更新失敗，請稍後再試', 'error');
+		}
+	} catch (error) {
+		loadingBar.error();
+		toast.show('發生錯誤，請稍後再試', 'error');
 	}
 };
 </script>

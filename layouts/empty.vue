@@ -2,9 +2,9 @@
 
 <template>
 	<div
-		class="min-h-screen min-w-screen flex flex-col relative bg-[url(https://i.pinimg.com/736x/53/fb/dc/53fbdc3ec68eedc97368de7ff7527903.jpg)]"
+		class="min-h-screen min-w-screen flex flex-col relative bg-[url(https://i.pinimg.com/736x/9d/d8/b3/9dd8b3aaf67fddef995efe7e3b6497ae.jpg)] bg-contain"
 	>
-		<slot />
+		<slot/>
 	</div>
 </template>
 

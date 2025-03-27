@@ -1,5 +1,5 @@
 <template>
-	<div class="px-8 flex flex-col items-center">
+	<div class="px-4 flex flex-col items-center">
 		<div class="mt-16 mb-8 flex justify-start w-full">
 			<div class="mr-8"><AuthAvatar /></div>
 			<div>

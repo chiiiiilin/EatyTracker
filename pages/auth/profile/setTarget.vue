@@ -1,7 +1,7 @@
 <template>
 	<UiBackButton />
 	<div class="flex flex-col items-center top-5 relative">
-		<h1 class="text-xl mb-16">設置個人目標</h1>
+		<h1 class="text-xl mb-8">設置個人目標</h1>
 		<ul class="steps mb-10">
 			<li class="step" :class="{ 'step-primary': currentStep >= 0 }">
 				基本資料
@@ -160,7 +160,9 @@
 									>kcal／天</span
 								>
 							</div>
-							<p class="text-sm text-gray-500 mt-2">
+							<p
+								class="text-sm text-gray-500 mt-2 whitespace-pre-line"
+							>
 								{{ calorieRangeText }}
 							</p>
 						</td>
@@ -250,6 +252,7 @@ import { useRouter } from 'vue-router';
 const router = useRouter();
 const authStore = useAuthStore();
 const toast = useToast();
+const loadingBar = useLoadingBar();
 
 const currentStep = ref(0);
 const totalSteps = 4;
@@ -424,13 +427,13 @@ const calorieRangeText = computed(() => {
 	const calorie = macroInput.value.calorie;
 
 	if (calorie < min) {
-		return `熱量過低，建議區間為 ${min} ~ ${max} kcal／天`;
+		return `熱量過低，\n建議區間為 ${min}~${max} kcal／天`;
 	}
 	if (calorie > max) {
-		return `熱量過高，建議區間為 ${min} ~ ${max} kcal／天`;
+		return `熱量過高，\n建議區間為 ${min}~${max} kcal／天`;
 	}
 
-	return `建議熱量區間：${min} ~ ${max} kcal／天`;
+	return `建議熱量區間：${min}~${max} kcal／天`;
 });
 
 const isCalorieEdited = ref(false);
@@ -469,7 +472,7 @@ const estimatedWeeks = computed(() => {
 
 	if (weeks > 200) return '設定太保守，建議重新評估';
 
-	return `依照此熱量攝取進度，您將於 ${Math.round(weeks)} 週後達成目標`;
+	return `依此進度，您將於 ${Math.round(weeks)} 週後達成目標`;
 });
 
 //營養素
@@ -544,26 +547,43 @@ const handleNext = async () => {
 	if (currentStep.value < totalSteps - 1) {
 		currentStep.value++;
 	} else {
-		const payload = {
-			birth: form.value.birth,
-			gender: form.value.gender,
-			height: form.value.height,
-			fitness_goal: form.value.fitnessGoal,
-			activity_level: form.value.activityLevel,
-			target_weight: form.value.targetWeight,
-			calorie_target: calorieTarget.value,
-			protain_target: macroGrams.value.protein,
-			fat_target: macroGrams.value.fat,
-			carb_target: macroGrams.value.carb,
-		};
+		if (isRatioInvalid.value) {
+			toast.show('營養素比例總和須為100%', 'error');
+		} else {
+			submitForm();
+		}
+	}
+};
+
+const submitForm = async () => {
+	loadingBar.start();
+	const payload = {
+		birth: form.value.birth,
+		gender: form.value.gender,
+		height: form.value.height,
+		fitness_goal: form.value.fitnessGoal,
+		activity_level: form.value.activityLevel,
+		target_weight: form.value.targetWeight,
+		calorie_target: calorieTarget.value,
+		protain_target: macroGrams.value.protein,
+		fat_target: macroGrams.value.fat,
+		carb_target: macroGrams.value.carb,
+	};
+
+	try {
 		const result = await authStore.updateUserProfile(payload);
 
 		if (result?.success) {
+			loadingBar.end();
 			router.push('/auth/profile');
 			toast.show('已儲存熱量及營養素目標!', 'success');
 		} else {
+			loadingBar.error();
 			toast.show('發生錯誤，請稍後再試', 'error');
 		}
+	} catch (error) {
+		loadingBar.error();
+		toast.show('發生錯誤，請稍後再試', 'error');
 	}
 };
 </script>

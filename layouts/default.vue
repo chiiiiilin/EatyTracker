@@ -6,8 +6,8 @@ onMounted(() => {
 </script>
 
 <template>
-	<div class="min-h-screen flex flex-col pb-24">
-		<div class="flex-1 bg-base-200">
+	<div class="min-h-screen flex flex-col">
+		<div class="flex-1 bg-base-200 pb-24">
 			<slot />
 		</div>
 		<TabBar />

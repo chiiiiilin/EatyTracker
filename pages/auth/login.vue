@@ -1,6 +1,6 @@
 <template>
 	<div
-		class="w-full rounded-t-3xl px-8 py-16 absolute bottom-0 z-50 bg-base-200"
+		class="w-full rounded-t-3xl px-8 py-8 absolute bottom-0 z-50 bg-base-200 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.2)]"
 	>
 		<h2 class="my-2">登入</h2>
 		<form @submit.prevent="submitEvent" class="flex flex-col">
@@ -68,6 +68,7 @@
 <script setup lang="ts">
 import { Mail } from 'lucide-vue-next';
 import { KeyRound } from 'lucide-vue-next';
+const loadingBar = useLoadingBar();
 
 definePageMeta({
 	layout: 'empty',
@@ -83,6 +84,7 @@ const user = ref({
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const submitEvent = async () => {
+	loadingBar.start();
 	if (!emailRegex.test(user.value.email)) {
 		toast.show('請輸入正確的電子郵件信箱', 'error');
 		return false;
@@ -95,12 +97,14 @@ const submitEvent = async () => {
 		);
 
 		if (result?.success) {
+			loadingBar.end();
 			await navigateTo('/');
-			toast.show('登入成功！', 'success');
 		} else {
+			loadingBar.error();
 			toast.show(result?.error, 'error');
 		}
 	} catch (error) {
+		loadingBar.error();
 		console.error(error);
 		toast.show('登入失敗，請稍後再試', 'error');
 	}
