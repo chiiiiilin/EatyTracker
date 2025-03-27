@@ -12,11 +12,13 @@ export default defineNuxtConfig({
 			autoprefixer: {},
 		},
 	},
+	plugins: ['@/plugins/supabase.ts', '@/plugins/initAuth.ts'],
 	modules: ['@nuxtjs/tailwindcss', '@pinia/nuxt', '@vite-pwa/nuxt'],
 	runtimeConfig: {
 		public: {
 			supabaseUrl: process.env.SUPABASE_URL || '',
 			supabaseKey: process.env.SUPABASE_KEY || '',
+			supabaseRedirectUrl: process.env.NUXT_SUPABASE_REDIRECT_URL || '',
 		},
 	},
 	pwa: {

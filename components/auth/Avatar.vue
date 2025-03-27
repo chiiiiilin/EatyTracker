@@ -4,15 +4,22 @@
 			class="mask mask-squircle w-24 cursor-pointer relative"
 			@click="triggerFileInput"
 		>
-			<img :src="authStore.userProfile.avatar_url" />
+			<img
+				v-if="authStore.userProfile?.avatar_url"
+				:src="authStore.userProfile.avatar_url"
+				alt="avatar"
+			/>
+			<div v-else class="skeleton w-24 h-24"></div>
 		</div>
 		<div
+			v-if="authStore.userProfile?.avatar_url"
 			class="bg-base-300 text-neutral absolute p-1 rounded-full right-0 bottom-0 cursor-pointer"
 		>
 			<Camera :size="16" />
 		</div>
 	</div>
 	<input
+		v-if="authStore.userProfile?.avatar_url"
 		type="file"
 		accept="image/*"
 		ref="fileInput"

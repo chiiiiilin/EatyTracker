@@ -9,10 +9,16 @@
 		</NuxtLayout>
 	</div>
 </template>
+
 <script setup>
 import UiToast from '@/components/ui/Toast.vue';
 import UiLoadingBar from '@/components/ui/LoadingBar.vue';
 import { useHead } from '#imports';
+import { useRoute, useRouter } from 'vue-router';
+
+const authStore = useAuthStore();
+const route = useRoute();
+const router = useRouter();
 
 const toastRef = ref(null);
 provide('toast', toastRef);
@@ -30,7 +36,35 @@ useHead({
 		},
 	],
 });
+
+const isAuthChecked = ref(false);
+
+const { data: userProfileData } = await useAsyncData('fetch-user', async () => {
+	await authStore.fetchUser();
+	isAuthChecked.value = true;
+
+	return authStore.userProfile || {};
+});
+
+onMounted(() => {
+	const isLoggedIn = !!authStore.user;
+	if (
+		!isLoggedIn &&
+		route.path !== '/auth/login' &&
+		route.path !== '/auth/register' &&
+		route.path !== '/auth/updatePassword'
+	) {
+		router.replace('/auth/login');
+	}
+	if (
+		isLoggedIn &&
+		(route.path === '/auth/login' || route.path === '/auth/register')
+	) {
+		router.replace('/auth/profile');
+	}
+});
 </script>
+
 <style>
 @import '@/assets/fonts/font.css';
 @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;500;700&family=Noto+Sans+TC:wght@300;500;700&display=swap');

@@ -3,56 +3,79 @@ import type { User } from '@supabase/supabase-js';
 
 export const useAuthStore = defineStore('authStore', () => {
 	const { $supabase }: any = useNuxtApp();
+	const config = useRuntimeConfig().public.supabaseRedirectUrl;
 	const user = ref<User | null>(null);
-	const userProfile = ref<any>(null);
+	const userProfile = ref<Record<string, any>>({});
 
 	const fetchUser = async () => {
-		const { data: session } = await $supabase.auth.getUser();
+		const {
+			data: { session },
+			error,
+		} = await $supabase.auth.getSession();
+
 		const authUser = session?.user;
-		if (!authUser) return;
 
-		user.value = authUser;
+		if (authUser) {
+			user.value = authUser;
 
-		// 抓取 users 資料表資料
-		const { data: existingUser } = await $supabase
-			.from('users')
-			.select('*')
-			.eq('id', authUser.id)
-			.single();
 
-		if (existingUser) {
-			userProfile.value = existingUser;
-		} else {
-			const newUser = {
-				id: authUser.id,
-				email: authUser.email,
-				display_name: authUser.user_metadata?.full_name || 'User',
-				avatar_url:
-					authUser.user_metadata?.avatar_url ||
-					'https://i.pinimg.com/736x/bb/93/99/bb93993d644835d9aa673c760cad0585.jpg',
-				created_at: new Date().toISOString(),
-			};
-
-			const { data: inserted, error: insertError } = await $supabase
+			const { data: existingUser, error: fetchError } = await $supabase
 				.from('users')
-				.insert(newUser)
-				.select()
+				.select('*')
+				.eq('id', authUser.id)
 				.single();
 
-			if (!insertError) {
-				userProfile.value = inserted;
-			} else {
-				console.error('寫入 userProfile 失敗', insertError);
+			if (fetchError) {
+				console.error('無法獲取 userProfile：', fetchError);
+
+				userProfile.value = {};
+				return;
 			}
+
+			if (existingUser) {
+				console.log('獲取到的 existingUser:', existingUser);
+				userProfile.value = {
+					...existingUser,
+					avatar_url:
+						existingUser.avatar_url ||
+						'https://i.pinimg.com/736x/bb/93/99/bb93993d644835d9aa673c760cad0585.jpg',
+				};
+			} else {
+				const newUser = {
+					id: authUser.id,
+					email: authUser.email,
+					display_name: authUser.user_metadata?.full_name || 'User',
+					avatar_url:
+						authUser.user_metadata?.avatar_url ||
+						'https://i.pinimg.com/736x/bb/93/99/bb93993d644835d9aa673c760cad0585.jpg',
+					created_at: new Date().toISOString(),
+				};
+
+				const { data: inserted, error: insertError } = await $supabase
+					.from('users')
+					.insert(newUser)
+					.select()
+					.single();
+
+				if (!insertError) {
+					userProfile.value = inserted;
+				} else {
+					console.error('寫入 userProfile 失敗', insertError);
+					userProfile.value = {};
+				}
+			}
+		} else {
+			user.value = null;
+			userProfile.value = {};
 		}
 	};
 
 	const signInWithOAuth = async () => {
 		const { data, error } = await $supabase.auth.signInWithOAuth({
 			provider: 'google',
-			// options: {
-			// 	redirectTo: 'http://localhost:3000/',
-			// },
+			options: {
+				redirectTo: `${config}`,
+			},
 		});
 		if (error) {
 			console.error('google 登入失敗', error);

@@ -1,5 +1,8 @@
 <template>
-	<div class="mx-auto w-full">
+	<div
+		class="mx-auto w-full"
+		v-if="Object.keys(authStore.userProfile).length !== 0"
+	>
 		<NuxtLink
 			class="bg-base-100 shadow-md rounded-2xl p-2 flex cursor-pointer"
 			to="/auth/profile/setTarget"

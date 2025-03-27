@@ -1,9 +1,4 @@
-<script setup lang="ts">
-const authStore = useAuthStore();
-onMounted(() => {
-	authStore.fetchUser();
-});
-</script>
+<script setup lang="ts"></script>
 
 <template>
 	<div class="min-h-screen flex flex-col">
