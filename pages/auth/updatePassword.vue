@@ -1,6 +1,6 @@
 <template>
 	<div
-		class="w-full rounded-t-3xl px-8 py-8 absolute bottom-0 z-50 bg-base-200 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.2)]"
+		class="w-full rounded-t-3xl px-8 py-8 absolute bottom-0 z-50 bg-base-100 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.2)]"
 	>
 		<h2 class="my-2">重設密碼</h2>
 		<form @submit.prevent="submitEvent" class="flex flex-col">
@@ -22,7 +22,7 @@
 					v-model="user.dbCheckPassword"
 				/>
 			</label>
-			<button class="btn btn-neutral mt-8 btn-xl">確認</button>
+			<button class="btn btn-base-content mt-8 btn-xl">確認</button>
 		</form>
 	</div>
 </template>

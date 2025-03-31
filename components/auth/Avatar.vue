@@ -13,7 +13,7 @@
 		</div>
 		<div
 			v-if="authStore.userProfile?.avatar_url"
-			class="bg-base-300 text-neutral absolute p-1 rounded-full right-0 bottom-0 cursor-pointer"
+			class="bg-base-300 text-base-content absolute p-1 rounded-full right-0 bottom-0 cursor-pointer"
 		>
 			<Camera :size="16" />
 		</div>

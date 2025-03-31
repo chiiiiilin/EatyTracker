@@ -26,7 +26,7 @@
 				<div class="skeleton h-6 w-48 mt-3" v-else></div>
 				<NuxtLink
 					v-if="authStore.userProfile.status_message"
-					class="btn btn-outline btn-primary btn-sm mt-2"
+					class="btn btn-outline btn-wide btn-primary btn-sm mt-2"
 					to="/auth/profile/edit"
 				>
 					編輯檔案

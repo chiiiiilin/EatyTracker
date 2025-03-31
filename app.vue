@@ -27,7 +27,6 @@ const loadingBarRef = ref(null);
 provide('loadingBar', loadingBarRef);
 
 useHead({
-	htmlAttrs: { 'data-theme': 'pastel' },
 	meta: [
 		{
 			name: 'viewport',

@@ -24,7 +24,7 @@ export default defineNuxtConfig({
 	app: {
 		head: {
 			title: 'EatyTracker',
-			meta: [{ name: 'theme-color', content: '#ffffff' }],
+			meta: [{ name: 'theme-color', content: '#09090B' }],
 			link: [
 				{
 					key: 'icon',
