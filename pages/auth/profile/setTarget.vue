@@ -564,7 +564,7 @@ const submitForm = async () => {
 		fitness_goal: form.value.fitnessGoal,
 		activity_level: form.value.activityLevel,
 		target_weight: form.value.targetWeight,
-		calorie_target: calorieTarget.value,
+		calorie_target: macroInput.value.calorie,
 		protain_target: macroGrams.value.protein,
 		fat_target: macroGrams.value.fat,
 		carb_target: macroGrams.value.carb,
