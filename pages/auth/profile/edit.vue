@@ -1,6 +1,6 @@
 <template>
-	<UiBackButton />
 	<div class="flex flex-col items-center top-5 relative">
+		<UiBackButton />
 		<h1 class="text-xl mb-16">編輯個人資料</h1>
 		<AuthAvatar />
 		<form class="w-full px-4 mt-5">

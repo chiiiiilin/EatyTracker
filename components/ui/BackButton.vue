@@ -1,5 +1,5 @@
 <template>
-	<button class="btn btn-ghost absolute top-3 left-1 z-[999]" @click="goBack">
+	<button class="btn btn-ghost absolute top-[-5px] left-1 z-[999]" @click="goBack">
 		<ChevronLeft class="w-6" />
 	</button>
 </template>
