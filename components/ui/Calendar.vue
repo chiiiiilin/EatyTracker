@@ -12,6 +12,7 @@
 			:view="showCalendar ? 'monthly' : 'weekly'"
 			transparent
 			borderless
+			:is-dark="isDark"
 			:attributes="calendarAttrs"
 			:locale="locale"
 			@dayclick="onSelectDate"
@@ -30,6 +31,12 @@ import 'v-calendar/style.css';
 const calendar = ref();
 const showCalendar = ref(false);
 const selectedDate = ref(new Date());
+
+const isDark = ref(false);
+
+onMounted(() => {
+	isDark.value = window.matchMedia('(prefers-color-scheme: dark)').matches;
+});
 
 const formattedDate = computed(() => {
 	const d = selectedDate.value;
@@ -58,14 +65,18 @@ const calendarAttrs = computed(() => [
 	{
 		key: 'today',
 		highlight: {
-			contentClass: 'bg-primary text-white font-bold rounded-full',
+			contentClass: isDark.value
+				? 'bg-accent-content text-white'
+				: 'bg-parimary text-white',
 		},
 		dates: [new Date()],
 	},
 	{
 		key: 'selected',
 		highlight: {
-			contentClass: 'bg-black text-white font-bold rounded-full',
+			contentClass: isDark.value
+				? 'bg-primary text-white'
+				: 'bg-black text-white',
 		},
 		dates: [selectedDate.value],
 	},
