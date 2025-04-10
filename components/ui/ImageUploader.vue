@@ -8,7 +8,7 @@
 				v-if="url"
 				:src="url"
 				alt="image"
-				class="w-full h-full object-contain"
+				class="w-full h-full object-cover"
 			/>
 			<div
 				v-else

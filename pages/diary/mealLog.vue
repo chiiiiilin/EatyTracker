@@ -6,7 +6,13 @@
 			<div class="flex justify-between">
 				<div
 					v-for="type in mealTypes"
-					class="py-2 px-4 rounded-md bg-base-300 cursor-pointer text-info-content opacity-20"
+					class="py-2 px-4 rounded-md cursor-pointer bg-base-300 text-base-content"
+					:class="
+						form.selectedMealType === type.value
+							? 'opacity-100 shadow-sm'
+							: 'opacity-20 '
+					"
+					@click="form.selectedMealType = type.value"
 				>
 					<component :is="type.icon" :size="28" />
 					<span class="text-xs">{{ type.label }}</span>
@@ -22,13 +28,14 @@
 					<fieldset class="fieldset">
 						<legend class="fieldset-legend">食物名稱</legend>
 						<div class="dropdown w-full">
-							<div class="input input-sm" @click="open = true">
+							<div class="input input-md" @click="open = true">
 								<input
 									v-model="searchText"
 									type="text"
 									placeholder="搜尋食物"
 									@input="filterFoods"
 									@focus="open = true"
+									@change="calculatedNutrition"
 								/>
 							</div>
 
@@ -53,12 +60,30 @@
 
 						<legend class="fieldset-legend">食用份量 (公克)</legend>
 						<input
+							v-model.number="form.quantity"
 							type="number"
-							class="input input-sm"
+							class="input input-md"
 							placeholder="填入克數"
+							@input="calculatedNutrition"
 						/>
 					</fieldset>
 				</div>
+			</div>
+			<div
+				class="h-24 w-full mt-3"
+				v-show="form.quantity && form.quantity !== 0 && selectFood"
+			>
+				<UiNutritionChart
+					class="w-full"
+					:protein="nutrition.protein"
+					:fat="nutrition.fat"
+					:carbs="nutrition.carbs"
+					:fiber="nutrition.fiber"
+					:sodium="nutrition.sodium"
+					:sugar="nutrition.sugar"
+					:cholesterol="nutrition.cholesterol"
+					:calories="nutrition.calories"
+				/>
 			</div>
 		</form>
 	</div>
@@ -88,6 +113,11 @@ const mealTypes = [
 	{ icon: CupSoda, value: 'drink', label: '飲品' },
 ];
 
+const form = ref({
+	selectedMealType: '',
+	quantity: 0,
+});
+
 //處理照片上傳
 const selectedFile = ref<File | null>(null);
 const imageUrl = ref<string | null>(null);
@@ -96,7 +126,7 @@ const uploadImageToSupabase = async () => {
 	// if (!selectedFile.value) return null;
 	// const fileName = `${Date.now()}_${selectedFile.value.name}`;
 	// const { data, error } = await $supabase.storage
-	// 	.from('meal') 
+	// 	.from('meal')
 	// 	.upload(`meal_images/${fileName}`, selectedFile.value);
 	// if (error) {
 	// 	console.error('圖片上傳失敗', error);
@@ -139,6 +169,40 @@ const selectFood = (food: Food) => {
 	selectedFood.value = food;
 	searchText.value = food.name;
 	open.value = false;
+};
+
+const nutrition = ref({
+	calories: 0,
+	protein: 0,
+	carbs: 0,
+	fat: 0,
+	fiber: 0,
+	sodium: 0,
+	sugar: 0,
+	cholesterol: 0,
+});
+const calculatedNutrition = () => {
+	if (!selectedFood.value) {
+		Object.keys(nutrition.value).forEach((key) => {
+			nutrition.value[key as keyof typeof nutrition.value] = 0;
+		});
+		return;
+	}
+
+	const ratio = form.value.quantity / 100;
+
+	nutrition.value.protein = +(selectedFood.value.protein * ratio).toFixed(1);
+	nutrition.value.carbs = +(selectedFood.value.carbs * ratio).toFixed(1);
+	nutrition.value.fat = +(selectedFood.value.fat * ratio).toFixed(1);
+	nutrition.value.fiber = +(selectedFood.value.fiber * ratio).toFixed(1);
+	nutrition.value.sodium = +(selectedFood.value.sodium * ratio).toFixed(1);
+	nutrition.value.sugar = +(selectedFood.value.sugar * ratio).toFixed(1);
+	nutrition.value.cholesterol = +(
+		selectedFood.value.cholesterol * ratio
+	).toFixed(1);
+	nutrition.value.calories = +(selectedFood.value.calories * ratio).toFixed(
+		1
+	);
 };
 </script>
 
