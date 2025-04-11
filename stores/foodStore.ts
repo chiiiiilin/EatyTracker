@@ -6,7 +6,10 @@ export const useFoodStore = defineStore('foodStore', () => {
 
 	const fetchFoods = async () => {
 		if (foods.value.length === 0) {
-			const { data, error } = await $supabase.from('foods').select('*');
+			const { data, error } = await $supabase
+				.from('foods')
+				.select('*')
+				.range(0, 4999);
 
 			if (error) {
 				console.error('無法獲取食物清單');
