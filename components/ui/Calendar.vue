@@ -34,6 +34,10 @@ const selectedDate = ref(new Date());
 
 const isDark = ref(false);
 
+const emit = defineEmits<{
+	(e: 'update:selectedDate', date: Date): void;
+}>();
+
 onMounted(() => {
 	isDark.value = window.matchMedia('(prefers-color-scheme: dark)').matches;
 });
@@ -53,6 +57,7 @@ const toggleCalendar = async () => {
 
 const onSelectDate = (day: { date: Date }) => {
 	selectedDate.value = day.date;
+	emit('update:selectedDate', day.date);
 };
 
 const setToday = () => {

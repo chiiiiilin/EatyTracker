@@ -254,7 +254,7 @@ const submit = async () => {
 				photoUrl = await uploadImageToSupabase(item.selectedFile);
 			}
 
-			const { error } = await $supabase.from('meal_log').insert({
+			const { error } = await $supabase.from('meal_logs').insert({
 				user_id: authStore.user?.id,
 				source_type: 'food',
 				meal_type: selectedMealType.value,
@@ -273,6 +273,7 @@ const submit = async () => {
 		}
 
 		router.push('/diary');
+		loadingBar.end();
 	} catch (error) {
 		loadingBar.error();
 		toast.show('發生錯誤，請稍後再試', 'error');
