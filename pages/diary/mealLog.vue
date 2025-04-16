@@ -119,6 +119,7 @@
 							:sugar="item.nutrition.sugar"
 							:cholesterol="item.nutrition.cholesterol"
 							:calories="item.nutrition.calories"
+							:showLabels="['蛋白質', '脂肪', '碳水']"
 						/>
 					</div>
 				</div>
@@ -229,29 +230,55 @@ const removeForm = (index: number) => {
 };
 
 //處理照片上傳
-const uploadImageToSupabase = async (file: File) => {
-	if (!file) return null;
-	const fileName = `${Date.now()}_${file.name}`;
+const uploadImageToSupabase = async (file: File, userId: string) => {
+	const filePath = `${userId}/${Date.now()}_${file.name}`;
 
-	const { data, error } = await $supabase.storage
-		.from('meal-log')
-		.upload(`${authStore.user?.id}/${fileName}`, file);
-	if (error) {
-		console.error('圖片上傳失敗', error);
-		return null;
-	}
+	const { error } = await $supabase.storage
+		.from('meal-logs')
+		.upload(filePath, file);
 
-	return $supabase.storage.from('meal').getPublicUrl(data.path).data
-		.publicUrl;
+	if (error) throw error;
+
+	const { publicUrl } = $supabase.storage
+		.from('meal-logs')
+		.getPublicUrl(filePath).data;
+
+	return {
+		publicUrl,
+		storagePath: filePath,
+	};
 };
 
 const submit = async () => {
+	if (!selectedMealType.value) {
+		return toast.show('請選擇餐別', 'error');
+	}
+
+	if (!selectedDate.value) {
+		return toast.show('請選擇日期', 'error');
+	}
+
+	const invalidItem = form.value.find(
+		(item) => !item.selectedFood || !item.quantity || item.quantity <= 0
+	);
+
+	if (invalidItem) {
+		return toast.show('請確認每筆食物都有選擇並填寫份量', 'error');
+	}
+
 	loadingBar.start();
 	try {
 		for (const item of form.value) {
 			let photoUrl = null;
+			let photoPath = null;
+
 			if (item.selectedFile) {
-				photoUrl = await uploadImageToSupabase(item.selectedFile);
+				const { publicUrl, storagePath } = await uploadImageToSupabase(
+					item.selectedFile,
+					authStore.user!.id
+				);
+				photoUrl = publicUrl;
+				photoPath = storagePath;
 			}
 
 			const { error } = await $supabase.from('meal_logs').insert({
@@ -261,7 +288,8 @@ const submit = async () => {
 				source_id: item.sourceId,
 				quantity: item.quantity,
 				date: selectedDate.value,
-				photo_url: item.imageUrl,
+				photo_url: photoUrl || null,
+				photo_path: photoPath || null,
 			});
 
 			if (error) {

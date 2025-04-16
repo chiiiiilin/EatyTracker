@@ -31,6 +31,7 @@ const props = defineProps<{
 	sugar: number;
 	cholesterol: number;
 	calories: number;
+	showLabels?: string[];
 }>();
 
 const chartData = ref<ChartData<'bar'>>({
@@ -60,28 +61,33 @@ watch(
 	{ immediate: true, deep: true }
 );
 
+const allLabels = ['蛋白質', '脂肪', '碳水', '膳食纖維', '鈉', '糖', '膽固醇'];
 const chartOptions = computed<ChartOptions<'bar'>>(() => ({
 	maintainAspectRatio: false,
 	indexAxis: 'y',
 	responsive: true,
 	plugins: {
-        title: {
-      display: true,
-      text: `熱量 ${props.calories} kcal`,
-      font: {
-        size: 14,
-      },
-      padding: {
-        bottom: 5,
-      },
-    },
+		title: {
+			display: true,
+			align: 'start',
+			text: `熱量 ${props.calories} kcal`,
+			font: {
+				size: 16,
+			},
+			padding: {
+				bottom: 5,
+			},
+		},
 		legend: {
 			display: true,
 			position: 'bottom',
+			align: 'start',
 			labels: {
 				filter: (legendItem) => {
-					const showLabels = ['蛋白質', '脂肪', '碳水'];
-					return showLabels.some((l) => legendItem.text.includes(l));
+					const labelsToShow = props.showLabels ?? allLabels;
+					return labelsToShow.some((label) =>
+						legendItem.text.includes(label)
+					);
 				},
 			},
 		},
