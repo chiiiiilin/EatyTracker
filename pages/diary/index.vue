@@ -131,6 +131,16 @@
 					</div>
 				</div>
 			</transition>
+			<transition name="fade" @after-leave="afterLeave">
+				<DiarySummaryModal
+					v-if="summaryVisible"
+					:selectedDate="selectedDate"
+					:totalCalories="todayTotalCalories"
+					:remainingCalories="remainingCalories"
+					:goal="selectedGoal"
+					@close="summaryVisible = false"
+				/>
+			</transition>
 		</main>
 		<div
 			class="fixed bottom-[100px] left-0 right-0 z-30 cursor-pointer"
@@ -143,10 +153,10 @@
 					<h4 class="text-base-content">
 						剩餘：
 						<span
-							class="font-semibold"
 							:class="[
-								'font-semibold text-base',
-								remainingCalories < 0
+								'font-semibold',
+								remainingCalories < -50 &&
+								selectedGoal.fitness_goal === 'cutting'
 									? 'text-error'
 									: 'text-base-content',
 							]"
@@ -301,11 +311,7 @@ const editMeal = (id: string) => {
 //目標營養素檢視面板
 onMounted(() => {
 	authStore.fetchUserGoalLog();
-	console.log(authStore.userGoalLog);
 });
-const goToSummary = () => {
-	router.push('/diary/summary');
-};
 
 const selectedGoal = computed(() => {
 	const logs = authStore.userGoalLog;
@@ -342,6 +348,11 @@ const remainingCalories = computed(() => {
 	if (!selectedGoal.value) return 0;
 	return selectedGoal.value.calorie_target - todayTotalCalories.value;
 });
+
+const summaryVisible = ref(false);
+const goToSummary = () => {
+	summaryVisible.value = true;
+};
 </script>
 
 <style scoped>
