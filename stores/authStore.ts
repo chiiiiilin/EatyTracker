@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import type { User } from '@supabase/supabase-js';
+import type { userGoalLog } from '~/types/userGoalLog';
 
 export const useAuthStore = defineStore('authStore', () => {
 	const { $supabase }: any = useNuxtApp();
@@ -17,7 +18,6 @@ export const useAuthStore = defineStore('authStore', () => {
 
 		if (authUser) {
 			user.value = authUser;
-
 
 			const { data: existingUser, error: fetchError } = await $supabase
 				.from('users')
@@ -257,6 +257,41 @@ export const useAuthStore = defineStore('authStore', () => {
 		}
 	};
 
+	const createUserGoalLog = async (payload: any) => {
+		if (!user.value) return;
+		const userId = user.value.id;
+		const today = new Date().toISOString().slice(0, 10);
+
+		const { error: upsertError } = await $supabase
+			.from('user_goal_logs')
+			.upsert(
+				{
+					user_id: userId,
+					start_date: today,
+					...payload,
+				},
+				{
+					onConflict: 'user_id,start_date',
+				}
+			);
+
+		if (upsertError) throw upsertError;
+	};
+
+	const userGoalLog = ref<userGoalLog[]>([]);
+	const fetchUserGoalLog = async () => {
+		if (!user.value) return;
+
+		const { data } = await $supabase
+			.from('user_goal_logs')
+			.select('*')
+			.eq('user_id', user.value.id);
+
+		if (data) {
+			userGoalLog.value = data;
+		}
+	};
+
 	return {
 		user,
 		userProfile,
@@ -267,5 +302,8 @@ export const useAuthStore = defineStore('authStore', () => {
 		signUp,
 		resendVerificationEmail,
 		updateUserProfile,
+		createUserGoalLog,
+		userGoalLog,
+		fetchUserGoalLog,
 	};
 });

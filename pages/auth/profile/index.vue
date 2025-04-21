@@ -59,6 +59,10 @@ const logout = async () => {
 		toast.show('登出失敗', 'error');
 	}
 };
+
+onMounted(() => {
+	authStore.fetchUser();
+});
 </script>
 
 <style scoped></style>

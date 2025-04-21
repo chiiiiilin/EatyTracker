@@ -1,6 +1,6 @@
 <template>
-	<UiBackButton />
 	<div class="flex flex-col items-center top-5 relative">
+		<UiBackButton />
 		<h1 class="text-xl mb-8">設置個人目標</h1>
 		<ul class="steps mb-10">
 			<li class="step" :class="{ 'step-primary': currentStep >= 0 }">
@@ -572,15 +572,20 @@ const submitForm = async () => {
 
 	try {
 		const result = await authStore.updateUserProfile(payload);
+		if (!result?.success) throw new Error('更新 users 失敗');
 
-		if (result?.success) {
-			loadingBar.end();
-			router.push('/auth/profile');
-			toast.show('已儲存熱量及營養素目標!', 'success');
-		} else {
-			loadingBar.error();
-			toast.show('發生錯誤，請稍後再試', 'error');
-		}
+		await authStore.createUserGoalLog({
+			calorie_target: payload.calorie_target,
+			protein_target: payload.protain_target,
+			fat_target: payload.fat_target,
+			carb_target: payload.carb_target,
+			fitness_goal: payload.fitness_goal,
+			activity_level: payload.activity_level,
+		});
+
+		loadingBar.end();
+		router.push('/auth/profile');
+		toast.show('已儲存熱量及營養素目標!', 'success');
 	} catch (error) {
 		loadingBar.error();
 		toast.show('發生錯誤，請稍後再試', 'error');

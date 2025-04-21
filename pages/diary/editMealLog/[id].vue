@@ -121,7 +121,7 @@
 							item.selectedFood
 						"
 					>
-						<UiNutritionChart
+						<DiaryNutritionChart
 							class="w-full"
 							:protein="item.nutrition.protein"
 							:fat="item.nutrition.fat"

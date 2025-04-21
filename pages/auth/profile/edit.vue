@@ -161,14 +161,19 @@ const submitProfile = async () => {
 	};
 	try {
 		const result = await authStore.updateUserProfile(payload);
+		if (!result?.success) throw new Error('更新 users 失敗');
 
-		if (result?.success) {
-			loadingBar.end();
-			router.push('/auth/profile');
-		} else {
-			loadingBar.error();
-			toast.show('更新失敗，請稍後再試', 'error');
-		}
+		await authStore.createUserGoalLog({
+			calorie_target: payload.calorie_target,
+			protein_target: authStore.userProfile.protain_target,
+			fat_target: authStore.userProfile.fat_target,
+			carb_target: authStore.userProfile.carb_target,
+			fitness_goal: payload.fitness_goal,
+			activity_level: payload.activity_level,
+		});
+
+		loadingBar.end();
+		router.push('/auth/profile');
 	} catch (error) {
 		loadingBar.error();
 		toast.show('發生錯誤，請稍後再試', 'error');
