@@ -1,8 +1,8 @@
 <template>
-	<div>
+	<div class="relative overflow-x-hidden">
 		<UiCalendar v-model:selectedDate="selectedDate" />
 
-		<main class="mt-2">
+		<main class="mt-2 mb-[30px]">
 			<div
 				v-for="item in sortedMealLogs"
 				:key="item.id"
@@ -67,13 +67,16 @@
 					<div
 						class="bg-base-100 rounded-lg max-w-sm w-full h-auto transition-all duration-300 overflow-hidden"
 					>
-						<div class="relative">
+						<div
+							class="relative"
+							:class="selectedItem?.photo_url ? 'h-64' : 'h-6'"
+						>
 							<img
 								v-if="selectedItem?.photo_url"
 								:src="selectedItem?.photo_url"
-								class="w-full h-65 object-cover"
+								class="w-full h-full object-cover"
 							/>
-							<div v-else class="w-full h-6"></div>
+							<div v-else class="w-full"></div>
 							<div
 								class="w-full h-auto absolute top-0 flex justify-between"
 								:class="
@@ -111,7 +114,7 @@
 								</p>
 							</div>
 							<div class="h-[150px] w-full">
-								<UiNutritionChart
+								<DiaryNutritionChart
 									v-if="computedNutrition"
 									class="w-full"
 									:protein="computedNutrition.protein"
@@ -129,6 +132,39 @@
 				</div>
 			</transition>
 		</main>
+		<div
+			class="fixed bottom-[100px] left-0 right-0 z-30 cursor-pointer"
+			@click="goToSummary"
+		>
+			<div
+				class="bg-base-300 rounded-md py-2 px-4 shadow-md w-fit mx-auto"
+			>
+				<template v-if="selectedGoal">
+					<h4 class="text-base-content">
+						剩餘：
+						<span
+							class="font-semibold"
+							:class="[
+								'font-semibold text-base',
+								remainingCalories < 0
+									? 'text-error'
+									: 'text-base-content',
+							]"
+						>
+							{{ selectedGoal.calorie_target }} -
+							{{ todayTotalCalories }} =
+							{{ remainingCalories }} kcal
+						</span>
+					</h4>
+				</template>
+				<h4 v-else>
+					總計:
+					<span class="font-semibold"
+						>{{ todayTotalCalories }} kcal</span
+					>
+				</h4>
+			</div>
+		</div>
 	</div>
 </template>
 
@@ -137,6 +173,7 @@ import { Trash2, X, Pencil } from 'lucide-vue-next';
 import type { Food } from '@/types/food';
 const { $supabase }: any = useNuxtApp();
 const foodStore = useFoodStore();
+const authStore = useAuthStore();
 const toast = useToast();
 const router = useRouter();
 
@@ -244,18 +281,15 @@ const deleteMeal = async (id: string) => {
 				.remove([target.photo_path]);
 
 			if (storageError) {
-				console.warn('❌ Storage 刪除失敗:', storageError);
-			} else {
-				console.log('✅ Storage 刪除成功');
+				console.warn('Storage 刪除失敗:', storageError);
 			}
 		}
 
 		foodStore.fetchMealLogs(selectedDate.value);
 		modalVisible.value = false;
 		setTimeout(() => (selectedItem.value = null), 300);
-		toast.show('已成功刪除', 'success');
 	} catch (err) {
-		console.error('❌ 刪除時發生錯誤:', err);
+		console.error('刪除時發生錯誤:', err);
 		toast.show('刪除失敗', 'error');
 	}
 };
@@ -263,6 +297,51 @@ const deleteMeal = async (id: string) => {
 const editMeal = (id: string) => {
 	router.push(`/diary/editMealLog/${id}`);
 };
+
+//目標營養素檢視面板
+onMounted(() => {
+	authStore.fetchUserGoalLog();
+	console.log(authStore.userGoalLog);
+});
+const goToSummary = () => {
+	router.push('/diary/summary');
+};
+
+const selectedGoal = computed(() => {
+	const logs = authStore.userGoalLog;
+	if (!logs?.length || !selectedDate.value) return null;
+
+	const selectedDateOnly = new Date(selectedDate.value);
+	selectedDateOnly.setHours(0, 0, 0, 0);
+
+	const validGoals = logs.filter((goal) => {
+		const goalDate = new Date(goal.start_date);
+		goalDate.setHours(0, 0, 0, 0);
+		return goalDate <= selectedDateOnly;
+	});
+
+	if (!validGoals.length) return null;
+
+	return validGoals.reduce((latest, current) => {
+		const latestDate = new Date(latest.start_date);
+		const currentDate = new Date(current.start_date);
+		return currentDate > latestDate ? current : latest;
+	});
+});
+
+const todayTotalCalories = computed(() => {
+	const sum = foodStore.mealLogs.reduce((total, item) => {
+		if (!item.food || !item.quantity) return total;
+		const ratio = item.quantity / 100;
+		return total + item.food.calories * ratio;
+	}, 0);
+	return Math.round(sum);
+});
+
+const remainingCalories = computed(() => {
+	if (!selectedGoal.value) return 0;
+	return selectedGoal.value.calorie_target - todayTotalCalories.value;
+});
 </script>
 
 <style scoped>
