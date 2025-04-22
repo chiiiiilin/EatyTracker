@@ -340,7 +340,6 @@ const submit = async () => {
 			.eq('id', id);
 
 		if (error) throw error;
-		toast.show('更新成功', 'success');
 		router.push('/diary');
 	} catch (err) {
 		console.error('更新失敗:', err);

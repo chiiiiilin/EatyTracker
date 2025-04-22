@@ -585,7 +585,6 @@ const submitForm = async () => {
 
 		loadingBar.end();
 		router.push('/auth/profile');
-		toast.show('已儲存熱量及營養素目標!', 'success');
 	} catch (error) {
 		loadingBar.error();
 		toast.show('發生錯誤，請稍後再試', 'error');

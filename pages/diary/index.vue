@@ -59,77 +59,15 @@
 				/>
 			</div>
 			<transition name="fade" @after-leave="afterLeave">
-				<div
-					v-show="modalVisible"
-					class="fixed inset-0 bg-black/60 z-50 flex justify-center items-center px-4"
-					@click.self="closeDetail"
-				>
-					<div
-						class="bg-base-100 rounded-lg max-w-sm w-full h-auto transition-all duration-300 overflow-hidden"
-					>
-						<div
-							class="relative"
-							:class="selectedItem?.photo_url ? 'h-64' : 'h-6'"
-						>
-							<img
-								v-if="selectedItem?.photo_url"
-								:src="selectedItem?.photo_url"
-								class="w-full h-full object-cover"
-							/>
-							<div v-else class="w-full"></div>
-							<div
-								class="w-full h-auto absolute top-0 flex justify-between"
-								:class="
-									selectedItem?.photo_url
-										? 'bg-gradient-to-b from-black/30 to-transparent text-white'
-										: 'text-base-content'
-								"
-							>
-								<X
-									:size="40"
-									class="p-3 cursor-pointer"
-									@click="closeDetail"
-								/>
-								<div class="flex">
-									<Trash2
-										:size="40"
-										class="p-3 cursor-pointer"
-										@click="deleteMeal(selectedItem.id)"
-									/>
-									<Pencil
-										:size="40"
-										class="p-3 cursor-pointer"
-										@click="editMeal(selectedItem.id)"
-									/>
-								</div>
-							</div>
-						</div>
-						<div class="px-3 py-6">
-							<div class="flex w-full justify-between">
-								<h3 class="text-lg font-bold mb-2">
-									{{ selectedItem?.food?.name }}
-								</h3>
-								<p class="text-lg opacity-60">
-									{{ selectedItem?.quantity }}g
-								</p>
-							</div>
-							<div class="h-[150px] w-full">
-								<DiaryNutritionChart
-									v-if="computedNutrition"
-									class="w-full"
-									:protein="computedNutrition.protein"
-									:fat="computedNutrition.fat"
-									:carbs="computedNutrition.carbs"
-									:fiber="computedNutrition.fiber"
-									:sodium="computedNutrition.sodium"
-									:sugar="computedNutrition.sugar"
-									:cholesterol="computedNutrition.cholesterol"
-									:calories="computedNutrition.calories"
-								/>
-							</div>
-						</div>
-					</div>
-				</div>
+				<DiaryMealDetailModal
+					v-if="modalVisible"
+					:visible="modalVisible"
+					:item="selectedItem"
+					:nutrition="computedNutrition"
+					@close="closeDetail"
+					@delete="deleteMeal"
+					@edit="editMeal"
+				/>
 			</transition>
 			<transition name="fade" @after-leave="afterLeave">
 				<DiarySummaryModal
@@ -143,43 +81,35 @@
 			</transition>
 		</main>
 		<div
-			class="fixed bottom-[100px] left-0 right-0 z-30 cursor-pointer"
+			class="bg-base-300 rounded-md py-2 px-4 shadow-md w-fit mx-auto cursor-pointer fixed bottom-[100px] left-1/2 translate-x-[-50%] z-30"
 			@click="goToSummary"
 		>
-			<div
-				class="bg-base-300 rounded-md py-2 px-4 shadow-md w-fit mx-auto"
-			>
-				<template v-if="selectedGoal">
-					<h4 class="text-base-content">
-						剩餘：
-						<span
-							:class="[
-								'font-semibold',
-								remainingCalories < -50 &&
-								selectedGoal.fitness_goal === 'cutting'
-									? 'text-error'
-									: 'text-base-content',
-							]"
-						>
-							{{ selectedGoal.calorie_target }} -
-							{{ todayTotalCalories }} =
-							{{ remainingCalories }} kcal
-						</span>
-					</h4>
-				</template>
-				<h4 v-else>
-					總計:
-					<span class="font-semibold"
-						>{{ todayTotalCalories }} kcal</span
+			<template v-if="selectedGoal">
+				<h4 class="text-base-content">
+					剩餘：
+					<span
+						:class="[
+							'font-semibold',
+							remainingCalories < -50 &&
+							selectedGoal.fitness_goal === 'cutting'
+								? 'text-error'
+								: 'text-base-content',
+						]"
 					>
+						{{ selectedGoal.calorie_target }} -
+						{{ todayTotalCalories }} = {{ remainingCalories }} kcal
+					</span>
 				</h4>
-			</div>
+			</template>
+			<h4 v-else>
+				總計:
+				<span class="font-semibold">{{ todayTotalCalories }} kcal</span>
+			</h4>
 		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
-import { Trash2, X, Pencil } from 'lucide-vue-next';
 import type { Food } from '@/types/food';
 const { $supabase }: any = useNuxtApp();
 const foodStore = useFoodStore();

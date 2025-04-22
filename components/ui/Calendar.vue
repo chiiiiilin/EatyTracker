@@ -106,6 +106,6 @@ const locale = {
 	padding: 0 15px;
 }
 :deep(.vc-title) {
-	@apply hidden;
+	display: none !important;
 }
 </style>
