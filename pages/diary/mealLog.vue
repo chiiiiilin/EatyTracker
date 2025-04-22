@@ -292,12 +292,7 @@ const submit = async () => {
 				photo_path: photoPath || null,
 			});
 
-			if (error) {
-				loadingBar.error();
-				toast.show('發生錯誤，請稍後再試', 'error');
-				console.error('資料寫入失敗:', error);
-				throw error;
-			}
+			if (error) throw error;
 		}
 
 		router.push('/diary');

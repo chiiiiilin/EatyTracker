@@ -7,7 +7,7 @@
 			class="bg-base-100 rounded-lg max-w-md w-full p-6 overflow-y-auto max-h-[80vh]"
 		>
 			<div class="flex justify-between items-center mb-4">
-				<h2 class="text-xl font-bold">今日營養素總結</h2>
+				<h2 class="text-xl font-bold">本日營養素總結</h2>
 				<X class="cursor-pointer" @click="$emit('close')" />
 			</div>
 

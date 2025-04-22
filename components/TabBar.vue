@@ -10,9 +10,12 @@
 			:class="{
 				'bg-primary-content text-neutral': route.path === item.to,
 				'text-primary-content':
-					route.path !== item.to && item.to !== '/diary/mealLog',
+					route.path !== item.to &&
+					item.to !== '/diary/mealLog' &&
+					item.to !== '/tracking/bodyLog',
 				'bg-secondary-content text-neutral':
-					item.to === '/diary/mealLog',
+					item.to === '/diary/mealLog' ||
+					item.to === '/tracking/bodyLog',
 			}"
 		>
 			<component :is="item.icon" :size="28" />
@@ -41,7 +44,10 @@ const navItems = computed(() => [
 		icon: route.path === '/diary' ? PencilLine : Notebook,
 		to: route.path === '/diary' ? '/diary/mealLog' : '/diary',
 	},
-	{ icon: ChartBarBig, to: '/tracking' },
+	{
+		icon: route.path === '/tracking' ? PencilLine : ChartBarBig,
+		to: route.path === '/tracking' ? '/tracking/bodyLog' : '/tracking',
+	},
 	{ icon: Settings2, to: '/auth/profile' },
 ]);
 </script>
