@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import type { User } from '@supabase/supabase-js';
 import type { userGoalLog } from '~/types/userGoalLog';
+import type { bodyLog } from '~/types/bodyLog';
 
 export const useAuthStore = defineStore('authStore', () => {
 	const { $supabase }: any = useNuxtApp();
@@ -292,6 +293,21 @@ export const useAuthStore = defineStore('authStore', () => {
 		}
 	};
 
+	const userBodyLog = ref<bodyLog[]>([]);
+	const fetchUserBodyLog = async () => {
+		if (!user.value) return;
+
+		const { data } = await $supabase
+			.from('health_records')
+			.select('*')
+			.eq('user_id', user.value.id)
+			.order('recorded_at', { ascending: true });
+
+		if (data) {
+			userBodyLog.value = data;
+		}
+	};
+
 	return {
 		user,
 		userProfile,
@@ -305,5 +321,7 @@ export const useAuthStore = defineStore('authStore', () => {
 		createUserGoalLog,
 		userGoalLog,
 		fetchUserGoalLog,
+		userBodyLog,
+		fetchUserBodyLog,
 	};
 });
