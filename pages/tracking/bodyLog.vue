@@ -133,6 +133,7 @@ const loadingBar = useLoadingBar();
 const router = useRouter();
 
 const form = ref<bodyLog>({
+	id: '',
 	recorded_at: '',
 	weight: null,
 	muscle_mass: null,
@@ -208,7 +209,7 @@ const submitEvent = async () => {
 
 	loadingBar.start();
 	try {
-		const { error } = await $supabase.from('health_records').insert({
+		const { error } = await $supabase.from('body_logs').insert({
 			user_id: authStore.user?.id,
 			...form.value,
 		});

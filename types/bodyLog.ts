@@ -1,4 +1,5 @@
 export type bodyLog = {
+	id: string;
 	recorded_at: string;
 	weight: number | null;
 	muscle_mass: number | null;

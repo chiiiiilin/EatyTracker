@@ -1,21 +1,122 @@
 <template>
-	<client-only>
-		<div
-			class="flex flex-col items-center top-16 relative w-full max-w-2xl px-4 space-y-6 pb-12"
-		>
-			<div
-				v-for="(chart, index) in charts"
-				:key="index"
-				class="h-36 w-full"
-			>
-				<Line
-					v-if="loaded"
-					:data="chart.data"
-					:options="chart.options"
-				/>
+	<div class="pt-12">
+		<div class="tabs tabs-border">
+			<!-- 趨勢圖 tab -->
+			<input
+				type="radio"
+				name="my_tabs_2"
+				class="tab"
+				aria-label="趨勢圖"
+				:checked="true"
+			/>
+			<div class="tab-content">
+				<client-only>
+					<div
+						class="flex flex-col items-center top-4 relative w-full max-w-2xl px-4 space-y-6"
+					>
+						<div
+							v-for="(chart, index) in charts"
+							:key="index"
+							class="h-36 w-full"
+						>
+							<Line
+								v-if="loaded"
+								:data="chart.data"
+								:options="chart.options"
+							/>
+						</div>
+					</div>
+				</client-only>
+			</div>
+			<!-- 紀錄 tab -->
+			<input
+				type="radio"
+				name="my_tabs_2"
+				class="tab"
+				aria-label="紀錄"
+			/>
+			<div class="tab-content">
+				<div class="overflow-x-auto">
+					<table class="table table-md table-pin-rows">
+						<thead>
+							<tr>
+								<th>日期</th>
+								<th>體重</th>
+								<th>體脂率</th>
+								<th>骨骼肌重</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr
+								v-for="(item, index) in paginatedLogs"
+								:key="index"
+								@click="openModal(item)"
+								class="cursor-pointer hover:bg-base-200"
+							>
+								<td>{{ formatDate(item.recorded_at) }}</td>
+								<td>{{ item.weight }}</td>
+								<td>{{ item.body_fat_pct }}</td>
+								<td>{{ item.muscle_mass }}</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
 			</div>
 		</div>
-	</client-only>
+		<transition name="fade">
+			<TrackingBodyLogDetailModal
+				v-if="showModal"
+				:visible="showModal"
+				:item="selectedItem"
+				@close="showModal = false"
+				@delete="handleDelete"
+				@edit="handleEdit"
+			/>
+		</transition>
+
+		<div v-if="totalPages > 1" class="flex justify-center mt-6">
+			<div class="join">
+				<button
+					class="join-item btn btn-square"
+					:disabled="page === 1"
+					@click="goToPage(1)"
+				>
+					«
+				</button>
+				<button
+					class="join-item btn btn-square"
+					:disabled="page === 1"
+					@click="prevPage"
+				>
+					‹
+				</button>
+				<template v-for="p in pagesToShow" :key="p">
+					<button
+						class="join-item btn btn-square"
+						:class="{ 'btn-active': page === p }"
+						@click="goToPage(p)"
+					>
+						{{ p }}
+					</button>
+				</template>
+
+				<button
+					class="join-item btn btn-square"
+					:disabled="page === totalPages"
+					@click="nextPage"
+				>
+					›
+				</button>
+				<button
+					class="join-item btn btn-square"
+					:disabled="page === totalPages"
+					@click="goToPage(totalPages)"
+				>
+					»
+				</button>
+			</div>
+		</div>
+	</div>
 </template>
 
 <script setup lang="ts">
@@ -40,6 +141,9 @@ interface ChartConfig {
 }
 
 const authStore = useAuthStore();
+const { $supabase }: any = useNuxtApp();
+const loadingBar = useLoadingBar();
+const toast = useToast();
 const loaded = ref(false);
 
 onMounted(async () => {
@@ -65,6 +169,125 @@ onMounted(async () => {
 		loaded.value = true;
 	}
 });
+
+const page = ref(1);
+const pageSize = 12;
+
+const sortedLogs = computed(() => {
+	return [...authStore.userBodyLog].sort((a, b) => {
+		return (
+			new Date(b.recorded_at).getTime() -
+			new Date(a.recorded_at).getTime()
+		);
+	});
+});
+
+const paginatedLogs = computed(() => {
+	const start = (page.value - 1) * pageSize;
+	const end = start + pageSize;
+	return sortedLogs.value.slice(start, end);
+});
+
+const totalPages = computed(() => {
+	return Math.ceil(sortedLogs.value.length / pageSize);
+});
+
+// 換頁邏輯
+const goToPage = (target: number) => {
+	if (target >= 1 && target <= totalPages.value) {
+		page.value = target;
+	}
+};
+
+const prevPage = () => {
+	if (page.value > 1) {
+		page.value--;
+	}
+};
+
+const nextPage = () => {
+	if (page.value < totalPages.value) {
+		page.value++;
+	}
+};
+
+// 動態顯示的頁碼列表
+const pagesToShow = computed(() => {
+	const pages: number[] = [];
+	const range = 2; // 前後各顯示2頁
+
+	let start = page.value - range;
+	let end = page.value + range;
+
+	if (start < 1) {
+		end += 1 - start;
+		start = 1;
+	}
+	if (end > totalPages.value) {
+		start -= end - totalPages.value;
+		end = totalPages.value;
+	}
+	if (start < 1) {
+		start = 1;
+	}
+
+	for (let i = start; i <= end; i++) {
+		pages.push(i);
+	}
+
+	return pages;
+});
+
+//紀錄的彈窗
+const showModal = ref(false);
+const selectedItem = ref<any>(null);
+
+const openModal = (item: any) => {
+	selectedItem.value = item;
+	showModal.value = true;
+};
+
+const handleDelete = async (id: string) => {
+	loadingBar.start();
+	try {
+		const { error } = await $supabase
+			.from('body_logs')
+			.delete()
+			.eq('id', id);
+
+		if (error) throw error;
+
+		loadingBar.end();
+		await authStore.fetchUserBodyLog();
+		showModal.value = false;
+	} catch (error) {
+		loadingBar.error();
+		toast.show('發生錯誤，請稍後重試', 'error');
+	}
+};
+
+const handleEdit = async (updatedItem: bodyLog) => {
+	loadingBar.start();
+	try {
+		const { error } = await $supabase
+			.from('body_logs')
+			.update({ ...updatedItem })
+			.eq('id', updatedItem.id);
+
+		if (error) throw error;
+
+		loadingBar.end();
+		await authStore.fetchUserBodyLog();
+		showModal.value = false;
+	} catch (error) {
+		loadingBar.error();
+		toast.show('發生錯誤，請稍後重試', 'error');
+	}
+};
+
+const formatDate = (dateStr: string) => {
+	return new Date(dateStr).toLocaleDateString('ja-JP').slice(0);
+};
 
 //黑暗模式
 const isDark = ref(false);
@@ -436,4 +659,13 @@ const charts = computed<ChartConfig[]>(() => [
 ]);
 </script>
 
-<style scoped></style>
+<style scoped>
+.fade-enter-active,
+.fade-leave-active {
+	transition: opacity 0.3s;
+}
+.fade-enter-from,
+.fade-leave-to {
+	opacity: 0;
+}
+</style>

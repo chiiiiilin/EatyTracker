@@ -298,7 +298,7 @@ export const useAuthStore = defineStore('authStore', () => {
 		if (!user.value) return;
 
 		const { data } = await $supabase
-			.from('health_records')
+			.from('body_logs')
 			.select('*')
 			.eq('user_id', user.value.id)
 			.order('recorded_at', { ascending: true });
