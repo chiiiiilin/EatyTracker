@@ -1,6 +1,5 @@
 <template>
 	<div class="top-5 relative">
-		<UiBackButton />
 		<div class="flex justify-end items-center gap-2">
 			<h1 class="text-lg text-center">新增飲食紀錄</h1>
 			<input
