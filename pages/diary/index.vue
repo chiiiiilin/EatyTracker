@@ -80,31 +80,36 @@
 				/>
 			</transition>
 		</main>
-		<div
-			class="bg-base-300 rounded-md py-2 px-4 shadow-md w-fit mx-auto cursor-pointer fixed bottom-[100px] left-1/2 translate-x-[-50%] z-30"
-			@click="goToSummary"
-		>
-			<template v-if="selectedGoal">
-				<h4 class="text-base-content">
-					剩餘：
-					<span
-						:class="[
-							'font-semibold',
-							remainingCalories < -50 &&
-							selectedGoal.fitness_goal === 'cutting'
-								? 'text-error'
-								: 'text-base-content',
-						]"
+		<div class="flex justify-center">
+			<div
+				class="bg-base-300 rounded-md py-2 px-3 shadow-md w-fit mx-auto cursor-pointer fixed bottom-[100px] z-30"
+				@click="goToSummary"
+			>
+				<template v-if="selectedGoal">
+					<h4 class="text-base-content">
+						剩餘：
+						<span
+							:class="[
+								'font-semibold',
+								remainingCalories < -50 &&
+								selectedGoal.fitness_goal === 'cutting'
+									? 'text-error'
+									: 'text-base-content',
+							]"
+						>
+							{{ selectedGoal.calorie_target }} -
+							{{ todayTotalCalories }} =
+							{{ remainingCalories }} kcal
+						</span>
+					</h4>
+				</template>
+				<h4 v-else>
+					總計:
+					<span class="font-semibold"
+						>{{ todayTotalCalories }} kcal</span
 					>
-						{{ selectedGoal.calorie_target }} -
-						{{ todayTotalCalories }} = {{ remainingCalories }} kcal
-					</span>
 				</h4>
-			</template>
-			<h4 v-else>
-				總計:
-				<span class="font-semibold">{{ todayTotalCalories }} kcal</span>
-			</h4>
+			</div>
 		</div>
 	</div>
 </template>

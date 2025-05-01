@@ -1,5 +1,5 @@
 <template>
-	<div class="flex flex-col bg-base-100 h-[calc(100vh-88px)]" >
+	<div class="flex flex-col bg-base-100 h-[calc(100vh-88px)] overflow-hidden" >
 		<h1 class="text-center text-lg font-bold py-4">AI 營養師</h1>
 		<div class="flex-1 flex flex-col justify-end px-3 py-3 overflow-auto">
 			<div class="space-y-3">
