@@ -1,5 +1,10 @@
 <template>
-	<div class="pt-12">
+	<div class="py-12 relative">
+		<NuxtLink
+			class="btn btn-xs btn-outline btn-primary absolute right-8 top-14"
+			to="/tracking/bodyLog"
+			>+ 新增紀錄</NuxtLink
+		>
 		<div class="tabs tabs-border">
 			<!-- 趨勢圖 tab -->
 			<input

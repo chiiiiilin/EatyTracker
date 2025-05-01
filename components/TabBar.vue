@@ -10,12 +10,9 @@
 			:class="{
 				'bg-primary-content text-neutral': route.path === item.to,
 				'text-primary-content':
-					route.path !== item.to &&
-					item.to !== '/diary/mealLog' &&
-					item.to !== '/tracking/bodyLog',
+					route.path !== item.to && item.to !== '/diary/mealLog',
 				'bg-secondary-content text-neutral':
-					item.to === '/diary/mealLog' ||
-					item.to === '/tracking/bodyLog',
+					item.to === '/diary/mealLog',
 			}"
 		>
 			<component :is="item.icon" :size="28" />
@@ -26,10 +23,9 @@
 <script setup>
 import {
 	House,
-	PencilLine,
-	Cherry,
+	Plus,
+	MessageCircle,
 	ChartBarBig,
-	Settings2,
 	Notebook,
 } from 'lucide-vue-next';
 
@@ -39,16 +35,10 @@ const route = useRoute();
 
 const navItems = computed(() => [
 	{ icon: House, to: '/' },
-	{ icon: Cherry, to: '/food' },
-	{
-		icon: route.path === '/diary' ? PencilLine : Notebook,
-		to: route.path === '/diary' ? '/diary/mealLog' : '/diary',
-	},
-	{
-		icon: route.path === '/tracking' ? PencilLine : ChartBarBig,
-		to: route.path === '/tracking' ? '/tracking/bodyLog' : '/tracking',
-	},
-	{ icon: Settings2, to: '/auth/profile' },
+	{ icon: Notebook, to: '/diary' },
+	{ icon: Plus, to: '/diary/mealLog' },
+	{ icon: MessageCircle, to: '/AIChat' },
+	{ icon: ChartBarBig, to: '/tracking' },
 ]);
 </script>
 
